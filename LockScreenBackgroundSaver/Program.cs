@@ -55,11 +55,7 @@ namespace LockScreenBackgroundSaver
           {
             var HashReturnValue = HashAlgorithm.ComputeHash(FileStream);
 
-            var sb = new StringBuilder();
-            for (int i = 0; i < HashReturnValue.Length; i++)
-              sb.Append(BitConverter.ToString(HashReturnValue));
-
-            var Hash = sb.ToString();
+            var Hash = BitConverter.ToString(HashReturnValue).Replace("-", String.Empty);
             if (!AssetHashFilePathDictionary.ContainsKey(Hash))
               AssetHashFilePathDictionary.Add(Hash, File.FullName);
           }
