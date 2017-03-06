@@ -10,6 +10,8 @@ namespace LockScreenBackgroundSaver
 {
   class Program
   {
+    private const int MinimumBackgroundSize = 1024 * 250;
+
     static void Main(string[] args)
     {
       var MonitorForNewImages = false;
@@ -35,36 +37,63 @@ namespace LockScreenBackgroundSaver
 
       // TODO: Validate that OutputFolder exists
 
-      const int MinimumBackgroundSize = 1024 * 100;
-      //var MonitorInterval = TimeSpan.FromMinutes(10);
-      var MonitorInterval = TimeSpan.FromSeconds(10);
+      var MonitorInterval = TimeSpan.FromMinutes(10);
+      //var MonitorInterval = TimeSpan.FromSeconds(10);
       var AssetPath = string.Format(@"C:\Users\{0}\AppData\Local\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets", Environment.UserName);
 
       do
       {
-        var AssetDirectoryInfo = new DirectoryInfo(AssetPath);
-        var AssetFiles = AssetDirectoryInfo.GetFiles();
-        var PotentialBackgroundFiles = AssetFiles.Where(File => File.Length > MinimumBackgroundSize).ToArray();
-        var AssetHashFilePathDictionary = new Dictionary<string, string>();
+        var AssetImageDetails = LoadImageDetails(AssetPath, ConsiderFileSize: true);
+        var OutputFolderImageDetails = LoadImageDetails(OutputFolder, ConsiderFileSize: false);
 
-        var HashAlgorithm = SHA256Managed.Create();
+        var AssetsToCopyList = AssetImageDetails.Where(Asset => !OutputFolderImageDetails.Exists(Output => Output.Hash == Asset.Hash));
 
-        foreach (var File in PotentialBackgroundFiles)
+        foreach (var AssetImageDetail in AssetsToCopyList)
         {
-          using (var FileStream = new FileStream(File.FullName, FileMode.Open))
-          {
-            var HashReturnValue = HashAlgorithm.ComputeHash(FileStream);
+          var DestinationPath = Path.Combine(OutputFolder, AssetImageDetail.Hash + ".jpg");
 
-            var Hash = BitConverter.ToString(HashReturnValue).Replace("-", String.Empty);
-            if (!AssetHashFilePathDictionary.ContainsKey(Hash))
-              AssetHashFilePathDictionary.Add(Hash, File.FullName);
-          }
+          if (!File.Exists(DestinationPath))
+            File.Copy(AssetImageDetail.FilePath, DestinationPath);
         }
-
+        
         if (MonitorForNewImages)
           Thread.Sleep(MonitorInterval);
       }
       while (MonitorForNewImages);
     }
+
+    private static List<ImageDetails> LoadImageDetails(string FolderPath, bool ConsiderFileSize)
+    {
+      var Result = new List<ImageDetails>();
+      var HashAlgorithm = SHA256Managed.Create();
+      var PotentialBackgroundFiles = new DirectoryInfo(FolderPath)
+        .GetFiles()
+        .Where(File => File.Length > MinimumBackgroundSize);
+
+      foreach (var File in PotentialBackgroundFiles)
+      {
+        using (var FileStream = new FileStream(File.FullName, FileMode.Open))
+        {
+          var HashBytes = HashAlgorithm.ComputeHash(FileStream);
+          var Hash = BitConverter.ToString(HashBytes).Replace("-", String.Empty);
+        
+          Result.Add(new ImageDetails(Hash, File.FullName));
+        }
+      }
+
+      return Result;
+    }
+  }
+
+  sealed class ImageDetails
+  {
+    public ImageDetails(string Hash, string FilePath)
+    {
+      this.Hash = Hash;
+      this.FilePath = FilePath;
+    }
+
+    public readonly string Hash;
+    public readonly string FilePath;
   }
 }
