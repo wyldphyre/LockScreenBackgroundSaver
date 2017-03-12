@@ -35,7 +35,11 @@ namespace LockScreenBackgroundSaver
         return;
       }
 
-      // TODO: Validate that OutputFolder exists
+      if (!Directory.Exists(OutputFolder))
+      {
+        Console.WriteLine("Cannot access folder: ", OutputFolder);
+        return;
+      }
 
       var MonitorInterval = TimeSpan.FromMinutes(10);
       //var MonitorInterval = TimeSpan.FromSeconds(10);
