@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Diagnostics;
 
 namespace LockScreenBackgroundSaver
 {
@@ -16,6 +17,7 @@ namespace LockScreenBackgroundSaver
     {
       var MonitorForNewImages = false;
       var OutputFolder = "";
+      var ShowNew = false;
 
       foreach (var argument in args)
       {
@@ -26,6 +28,10 @@ namespace LockScreenBackgroundSaver
         else if (argument.StartsWith("-output:"))
         {
           OutputFolder = argument.Split(':').Last();
+        }
+        else if (argument.StartsWith("-shownew"))
+        {
+          ShowNew = true;
         }
       }
 
@@ -59,7 +65,10 @@ namespace LockScreenBackgroundSaver
           if (!File.Exists(DestinationPath))
             File.Copy(AssetImageDetail.FilePath, DestinationPath);
         }
-        
+
+        if (ShowNew && AssetsToCopyList.Any())
+          Process.Start(OutputFolder);
+
         if (MonitorForNewImages)
           Thread.Sleep(MonitorInterval);
       }
