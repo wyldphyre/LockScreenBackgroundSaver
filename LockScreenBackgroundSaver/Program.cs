@@ -29,7 +29,7 @@ namespace LockScreenBackgroundSaver
         {
           OutputFolder = argument.Split(':').Last();
         }
-        else if (argument.StartsWith("-shownew"))
+        else if (argument.Equals("-shownew", StringComparison.InvariantCultureIgnoreCase))
         {
           ShowNew = true;
         }
