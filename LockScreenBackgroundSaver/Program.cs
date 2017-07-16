@@ -11,7 +11,7 @@ namespace LockScreenBackgroundSaver
 {
   class Program
   {
-    private const int MinimumBackgroundSize = 1024 * 250;
+    private const int MinimumBackgroundImageSize = 1024 * 250;
 
     static void Main(string[] args)
     {
@@ -81,7 +81,7 @@ namespace LockScreenBackgroundSaver
       var HashAlgorithm = SHA256Managed.Create();
       var PotentialBackgroundFiles = new DirectoryInfo(FolderPath)
         .GetFiles()
-        .Where(File => File.Length > MinimumBackgroundSize);
+        .Where(File => File.Length > MinimumBackgroundImageSize);
 
       foreach (var File in PotentialBackgroundFiles)
       {
