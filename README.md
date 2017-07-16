@@ -7,6 +7,10 @@ Looks for the lock screen background images that Windows 10 uses and outputs the
 - `-shownew`: The output folder will be opened if new images are found
 - `-output:<folder>`: The folder where images will be placed
 
+## Ignoring Images
+
+If there are images you don't want placed into the output folder, create an `ignore.txt` file in the output folder and copy the name of the file (excluding the extension) into the file. Place each ignored file name on a separate line. The app will check this file, if present, for files that it will ignore.
+
 ## To Do
 
 - Provide a way to specify that only certain types of images are stored, such as desktop or phone backgrounds.
