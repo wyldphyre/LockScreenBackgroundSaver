@@ -50,15 +50,15 @@ namespace LockScreenBackgroundSaver
       var IgnoredFileHashes = new string[0];
       var IgnoreFilePath = Path.Combine(OutputFolder, "ignore.txt");
 
-      if (File.Exists(IgnoreFilePath))
-        IgnoredFileHashes = File.ReadAllLines(IgnoreFilePath);
-
       var MonitorInterval = TimeSpan.FromMinutes(10);
       //var MonitorInterval = TimeSpan.FromSeconds(10);
       var AssetPath = string.Format(@"C:\Users\{0}\AppData\Local\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets", Environment.UserName);
 
       do
       {
+        if (File.Exists(IgnoreFilePath))
+          IgnoredFileHashes = File.ReadAllLines(IgnoreFilePath);
+
         var AssetImageDetails = LoadImageDetails(AssetPath, ConsiderFileSize: true);
         var OutputFolderImageDetails = LoadImageDetails(OutputFolder, ConsiderFileSize: false);
 
